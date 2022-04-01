@@ -53,6 +53,22 @@ six = "*"
 termcolor = "*"
 
 [[package]]
+name = "midi2audio"
+version = "0.1.1"
+description = "Easy to use MIDI to audio or playback via FluidSynth"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "pydub"
+version = "0.25.1"
+description = "Manipulate audio with an simple and easy high level interface"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "python-telegram-bot"
 version = "13.11"
 description = "We have made you a wrapper you can't refuse"
@@ -142,7 +158,7 @@ test = ["pytest-mock (>=3.3)", "pytest (>=4.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "81534c52f49bf1558b62b6befbdc30c8a6407712ceea673051a295a73e7d28bf"
+content-hash = "d4be52a92fbcd87b62b2e8f9515bd2342b15a3dbf74c23ceab0b131162c5fe30"
 
 [metadata.files]
 apscheduler = [
@@ -159,6 +175,14 @@ certifi = [
 ]
 fire = [
     {file = "fire-0.4.0.tar.gz", hash = "sha256:c5e2b8763699d1142393a46d0e3e790c5eb2f0706082df8f647878842c216a62"},
+]
+midi2audio = [
+    {file = "midi2audio-0.1.1-py2.py3-none-any.whl", hash = "sha256:762a2df3806d373f7f89962f22ecc6d3cb49f82ae4212fab560a479cbb6c9c08"},
+    {file = "midi2audio-0.1.1.tar.gz", hash = "sha256:b26590388e1f62753096b075b877e2529ff62faad00c07811ac8111a73e4a78a"},
+]
+pydub = [
+    {file = "pydub-0.25.1-py2.py3-none-any.whl", hash = "sha256:65617e33033874b59d87db603aa1ed450633288aefead953b30bded59cb599a6"},
+    {file = "pydub-0.25.1.tar.gz", hash = "sha256:980a33ce9949cab2a569606b65674d748ecbca4f0796887fd6f46173a7b0d30f"},
 ]
 python-telegram-bot = [
     {file = "python-telegram-bot-13.11.tar.gz", hash = "sha256:baeff704baa2ac3dc17a944c02da888228ad258e89be2e5bcbd13a8a5102d573"},
