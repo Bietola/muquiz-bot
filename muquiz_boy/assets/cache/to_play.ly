@@ -1,7 +1,7 @@
 \language "english"
 \score {
     \relative c {
-        a
+        e
     }
     \midi {}
 }

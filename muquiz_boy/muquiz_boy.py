@@ -30,7 +30,8 @@ g_game = {
     ),
 
     'round': {
-        'answer': 'c'
+        'answer': 'c',
+        'messages_to_del': []
     }
 }
 
@@ -57,6 +58,7 @@ def cancel_round(upd, ctx):
 
 def start_round(upd, ctx):
     global g_game
+    msg_to_del = g_game['round']['messages_to_del']
 
     old_dir = Path().cwd()
     os.chdir(paths.CACHE)
@@ -78,8 +80,12 @@ def start_round(upd, ctx):
     #     'jig.mp3', format='mp3'
     # )
 
-    upd.message.reply_audio(open('jig.flac', 'rb'))
-    upd.message.reply_text(f'prize: {g_game["INIT_PRIZE"]}')
+    msg_to_del.append(
+        upd.message.reply_audio(
+            open('jig.flac', 'rb'),
+            caption=f'Prize: {g_game["INIT_PRIZE"]}'
+        )
+    )
     
     # Pick and send note(s) to guess
     # TODO: Handle multiple notes
@@ -87,31 +93,40 @@ def start_round(upd, ctx):
     answer = random.choice(g_game['ALL_NOTES'])
     g_game['round']['answer'] = answer
 
-    upd.message.reply_audio(
+    msg_to_del.append(upd.message.reply_audio(
         open(ly_utils.expr_to_file(answer), 'rb'),
         caption='Guess this note'
-    )
+    ))
 
     os.chdir(old_dir)
     return RECV_ANS
 
 def receive_ans(upd, ctx):
     global g_game
+    msg_to_del = g_game['round']['messages_to_del']
     players = g_game['players']
     user = upd.message.from_user.username
 
     prize = g_game['INIT_PRIZE'] / (2 ** players[user]['attempts'])
 
+    msg_to_del.append(upd.message)
+
     if upd.message.text.lower() == g_game['round']['answer']:
         upd.message.reply_text(f'Ye, {user} gets +{prize}')
         players[user]['points'] += prize
-        
+
+        for msg in msg_to_del:
+            ctx.bot.delete_message(upd.effective_chat.id, msg.message_id)
+        g_game['round']['messages_to_del'] = []
+
         save_game()
 
         return ConversationHandler.END
 
     else:
-        upd.message.reply_text(f'{user} is wrong (prize = {prize / 2})')
+        msg_to_del.append(
+            upd.message.reply_text(f'{user} is wrong (prize = {prize / 2})')
+        )
         players[user]['attempts'] += 1
 
         return RECV_ANS
