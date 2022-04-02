@@ -53,12 +53,3 @@ def make_lilypond_expr(expr, language='english', relative_note='c'):
 
     os.chdir(old_path)
     return pdf_path, midi_path, ly_path
-
-
-def add_midi_to_abjad_output(raw):
-    fixed_score_wrapper = '\n'.join(
-        [r'\score {'] + raw.split('\n')[2:-1] + [r'}']
-    )
-    fixed_midi = fixed_score_wrapper.replace(r'\new midi', r'\midi')
-
-    return fixed_midi

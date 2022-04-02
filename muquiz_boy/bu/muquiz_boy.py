@@ -6,7 +6,6 @@ from pathlib import Path
 import os
 import shutil
 import random
-import abjad as abj
 
 import bot_paths as paths
 from ly_utils import *
@@ -68,32 +67,8 @@ def start_round(upd, ctx):
 
     # Generate and send jig
     # TODO: Handle transposition
-    # shutil.copy(paths.TEMPLATES / 'c_jig.ly', './jig.ly')
-    score = abj.Score([abj.StaffGroup(
-        [abj.Staff(
-            [abj.Voice(
-                r"\relative c { <c e g c>4 <f a d f> <g b d g> <c, e g c> }"
-            )]
-         ),
-         abj.Staff(
-            [abj.Voice(
-                r"\relative c, { c4 f g c, }"
-            )]
-        )],
-        lilypond_type='PianoStaff'
-    )])
-    jig = abj.Block(
-        'score',
-        [
-            abj.Block('midi'),
-            score
-        ]
-    )
-    jig_ly = abj.LilyPondFile([jig])
-
-    # os.system('lilypond jig.ly')
-    os.system('rm -f *.midi')
-    abj.persist.as_midi(jig_ly, 'jig.midi')
+    shutil.copy(paths.TEMPLATES / 'c_jig.ly', './jig.ly')
+    os.system('lilypond jig.ly')
 
     audio_path = midi2flac('jig.midi')
 
@@ -196,7 +171,7 @@ def mk_reply(upd, ctx):
 
 def mkloop(upd, ctx):
     user = upd.message.from_user.username
-    # current_ly = g_game['players'][user]['saves']['current']
+    current_ly = g_game['players'][user]['saves']['current']
 
     # TODO: Err not text
     expr = upd.message.text
@@ -205,21 +180,21 @@ def mkloop(upd, ctx):
 
     if expr == '/stop':
         return ConversationHandler.END
-    # elif m := re.compile(r'^/tr\s+(\w+)\s+(\w+)\s*$').match(expr):
-    #     frm = m.group(1)
-    #     to = m.group(2)
+    elif m := re.compile(r'^/tr\s+(\w+)\s+(\w+)\s*$').match(expr):
+        frm = m.group(1)
+        to = m.group(2)
 
-    #     ly.music.document(
-    #         ly.document.Document(current_ly)
-    #     )
+        ly.music.document(
+            ly.document.Document(current_ly)
+        )
 
-    #     current_ly = ly.transpose(current_ly, frm, to)
+        current_ly = ly.transpose(current_ly, frm, to)
 
-    #     # TODO: upd.message.reply_text(ly_extract_expr(current_ly))
-    #     upd.message.reply_text(current_ly)
-    #     # ly_make_send(current_ly)
+        # TODO: upd.message.reply_text(ly_extract_expr(current_ly))
+        upd.message.reply_text(current_ly)
+        # ly_make_send(current_ly)
 
-    #     return MKLOOP
+        return MKLOOP
 
     # TODO: Wrap in ly_make_send
     pdf_path, midi_path, ly_path = make_lilypond_expr(
@@ -227,6 +202,8 @@ def mkloop(upd, ctx):
         relative_note='c\''
         # language=''
     )
+
+    shutil.copy(ly_path, paths.CURRENT_LY)
 
     upd.message.reply_audio(
         open(midi2flac(midi_path), 'rb')

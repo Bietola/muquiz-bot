@@ -10,8 +10,12 @@ fire = "^0.4.0"
 python-telegram-bot = "^13.11"
 midi2audio = "^0.1.1"
 pydub = "^0.25.1"
+abjad = "^3.6"
 
 [tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+muquiz-boy = 'muquiz_boy.main:main'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
