@@ -1,9 +1,9 @@
 \version "2.22.0"
 
 % Utility functions
-showBarNums = \override Score.BarNumber.break-visibility = ##(#t #t #t)
-silenceMidi = \set Staff.midiMaximumVolume = #0
-wrong = \override NoteHead.color = #red
+% showBarNums = \override Score.BarNumber.break-visibility = ##(#t #t #t)
+% silenceMidi = \set Staff.midiMaximumVolume = #0
+% wrong = \override NoteHead.color = #red
 
 % Parts of the score
 upper = \relative c'' {
@@ -27,7 +27,6 @@ lower = \relative c {
     % Bass
     \new PianoStaff \with { 
       instrumentName = "Piano" 
-      midiInstrument = "piano"
     } {
       <<
         \new Staff = "upper" \upper

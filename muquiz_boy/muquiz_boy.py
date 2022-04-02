@@ -9,7 +9,7 @@ import random
 import abjad as abj
 
 import bot_paths as paths
-from ly_utils import *
+import ly_utils as ly
 
 # Game options
 g_options = json.loads(
@@ -69,33 +69,15 @@ def start_round(upd, ctx):
     # Generate and send jig
     # TODO: Handle transposition
     # shutil.copy(paths.TEMPLATES / 'c_jig.ly', './jig.ly')
-    score = abj.Score([abj.StaffGroup(
-        [abj.Staff(
-            [abj.Voice(
-                r"\relative c { <c e g c>4 <f a d f> <g b d g> <c, e g c> }"
-            )]
-         ),
-         abj.Staff(
-            [abj.Voice(
-                r"\relative c, { c4 f g c, }"
-            )]
-        )],
-        lilypond_type='PianoStaff'
-    )])
-    jig = abj.Block(
-        'score',
-        [
-            abj.Block('midi'),
-            score
-        ]
-    )
-    jig_ly = abj.LilyPondFile([jig])
 
     # os.system('lilypond jig.ly')
     os.system('rm -f *.midi')
-    abj.persist.as_midi(jig_ly, 'jig.midi')
+    abj.persist.as_midi(
+        abj.LilyPondFile([ly.ear_training_jig()]),
+        'jig.midi'
+    )
 
-    audio_path = midi2flac('jig.midi')
+    audio_path = ly.midi2flac('jig.midi')
 
     # from pydub import AudioSegment
     # AudioSegment.from_file(
@@ -119,7 +101,7 @@ def start_round(upd, ctx):
 
     msg_to_del.append(upd.message.reply_audio(
         open(
-            midi2flac(make_lilypond_expr(answer)[1]),
+            ly.midi2flac(ly.make_lilypond_expr(answer)[1]),
             'rb'
         ),
         caption='Guess this note'
@@ -182,10 +164,10 @@ def mk_reply(upd, ctx):
     if not (to_execute := reply.text):
         return
 
-    pdf_path, midi_path = make_lilypond_expr(to_execute)
+    pdf_path, midi_path = ly.make_lilypond_expr(to_execute)
 
     upd.message.reply_audio(
-        open(midi2flac(midi_path), 'rb')
+        open(ly.midi2flac(midi_path), 'rb')
     )
     upd.message.reply_document(
         open(pdf_path, 'rb')
@@ -222,14 +204,14 @@ def mkloop(upd, ctx):
     #     return MKLOOP
 
     # TODO: Wrap in ly_make_send
-    pdf_path, midi_path, ly_path = make_lilypond_expr(
+    pdf_path, midi_path, ly_path = ly.make_lilypond_expr(
         expr,
         relative_note='c\''
         # language=''
     )
 
     upd.message.reply_audio(
-        open(midi2flac(midi_path), 'rb')
+        open(ly.midi2flac(midi_path), 'rb')
     )
     upd.message.reply_document(
         open(pdf_path, 'rb')

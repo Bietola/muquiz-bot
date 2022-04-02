@@ -2,6 +2,34 @@ import bot_paths as paths
 import os
 from pathlib import Path
 import re
+import abjad as abj
+
+
+def ear_training_jig(key='c'):
+    # TODO: Transpose to correct key
+
+    score = abj.Score([abj.StaffGroup(
+        [abj.Staff(
+            [abj.Voice(
+                r"\relative c { <c e g c>4 <f a d f> <g b d g> <c, e g c> }"
+            )]
+         ),
+         abj.Staff(
+            [abj.Voice(
+                r"\relative c, { c4 f g c, }"
+            )]
+        )],
+        lilypond_type='PianoStaff'
+    )])
+    jig = abj.Block(
+        'score',
+        [
+            abj.Block('midi'),
+            score
+        ]
+    )
+
+    return jig
 
 
 def midi2flac(midi_path, out=None):

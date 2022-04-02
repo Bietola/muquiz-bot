@@ -3,7 +3,7 @@
 \language "english"
 \score {
     \relative c {
-        d
+        f
     }
     \layout {}
     \midi {}
