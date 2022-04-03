@@ -2,8 +2,8 @@
 
 \language "english"
 \score {
-    \relative c {
-        f
+    \relative c' {
+        d8. cs16 d8 b16 cs d b a fs8 e16 d e8
     }
     \layout {}
     \midi {}

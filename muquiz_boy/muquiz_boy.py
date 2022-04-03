@@ -4,10 +4,9 @@ from collections import defaultdict
 import json
 from pathlib import Path
 import os
-import shutil
-import random
 import abjad as abj
 
+import progression as prog
 import bot_paths as paths
 import ly_utils as ly
 
@@ -61,6 +60,10 @@ def start_round(upd, ctx):
     global g_game
     msg_to_del = g_game['round']['messages_to_del']
 
+    user = upd.message.from_user.username
+    level = prog.get_lv(g_game, user)
+    msg_to_del = g_game['round']['messages_to_del']
+
     old_dir = Path().cwd()
     os.chdir(paths.CACHE)
 
@@ -73,7 +76,7 @@ def start_round(upd, ctx):
     # os.system('lilypond jig.ly')
     os.system('rm -f *.midi')
     abj.persist.as_midi(
-        abj.LilyPondFile([ly.ear_training_jig()]),
+        ly.ear_training_jig(),
         'jig.midi'
     )
 
@@ -88,23 +91,32 @@ def start_round(upd, ctx):
 
     msg_to_del.append(
         upd.message.reply_audio(
-            open(audio_path, 'rb'),
-            caption=f'Prize: {g_game["INIT_PRIZE"]}'
+            open(audio_path, 'rb')
         )
     )
     
     # Pick and send note(s) to guess
     # TODO: Handle multiple notes
     # TODO: Handle other scales
-    answer = random.choice(g_game['ALL_NOTES'])
+    # TODO: Handle jig
+    answer, _jig = prog.gen_round_info(level)
+    # TODO/CC: Find a way to convert this to simple string (e.g. 'c ds e') and test if it matches guess in msg form
     g_game['round']['answer'] = answer
 
     msg_to_del.append(upd.message.reply_audio(
         open(
-            ly.midi2flac(ly.make_lilypond_expr(answer)[1]),
+            ly.midi2flac(
+                abj.persist.as_midi(
+                    ly.lyfile_wrap(
+                        abj.Score([abj.Voice(answer)]),
+                        gen_midi=True
+                    ),
+                    'answer.midi'
+                )[0]
+            ),
             'rb'
         ),
-        caption='Guess this note'
+        caption=f'Guess this tune (prize: {g_game["INIT_PRIZE"]})'
     ))
 
     os.chdir(old_dir)
@@ -121,7 +133,14 @@ def receive_ans(upd, ctx):
 
     msg_to_del.append(upd.message)
 
-    if upd.message.text.lower() == g_game['round']['answer']:
+    str_answer = [
+        note.written_pitch.get_name().lower()
+        for note in g_game['round']['answer']
+    ]
+
+    # upd.message.reply_text(f'DB: {str_answer}')
+
+    if upd.message.text.lower().split() == str_answer:
         upd.message.reply_text(f'Ye, {user} gets +{prize}')
         players[user]['points'] += prize
 

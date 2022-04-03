@@ -1,8 +1,9 @@
 {
     "Dincio": {
-        "points": 460.0,
+        "points": 520.0,
         "active": false,
-        "attempts": 0
+        "attempts": 0,
+        "level": 2
     },
     "NiggaCrash": {
         "points": 140.0,

@@ -3,6 +3,36 @@ import os
 from pathlib import Path
 import re
 import abjad as abj
+import sys
+
+
+MODES = {
+    "major": abj.IntervalSegment("M2 M2 m2 M2 M2 M2 m2"),
+    "minor": abj.IntervalSegment("M2 m2 M2 M2 m2 M2 M2"),
+    "dorian": abj.IntervalSegment("M2 m2 M2 M2 M2 m2 M2"),
+}
+
+
+def make_scale(tonic, interval_segment, octave=4, degrees=range(1, 8)):
+    pitches = []
+    pitch = abj.NamedPitch(tonic)
+    pitches.append(pitch)
+    for i, interval in enumerate(interval_segment):
+        if (i + 1) in degrees:
+            pitch = pitch + interval
+            pitches.append(pitch)
+    pitch_segment = abj.PitchSegment(pitches)
+    return pitch_segment
+
+
+def lyfile_wrap(score, gen_midi=False):
+    return abj.LilyPondFile([abj.Block(
+        'score',
+        [
+            abj.Block('midi'),
+            score
+        ] if gen_midi else [score]
+    )])
 
 
 def ear_training_jig(key='c'):
@@ -21,27 +51,23 @@ def ear_training_jig(key='c'):
         )],
         lilypond_type='PianoStaff'
     )])
-    jig = abj.Block(
-        'score',
-        [
-            abj.Block('midi'),
-            score
-        ]
-    )
 
-    return jig
+    return lyfile_wrap(score, gen_midi=True)
 
 
 def midi2flac(midi_path, out=None):
     def err():
-        print(f'ERR: Malformed midi file {midi_path}', file=os.stderr)
+        print(f'ERR: Malformed midi file {midi_path}', file=sys.stderr)
 
-    if isinstance(midi_path, str):
-        midi_str = midi_path
-        midi_path = Path(midi_str)
-    elif isinstance(midi_path, Path):
+    if isinstance(midi_path, Path):
         midi_str = str(midi_path.resolve())
         midi_path = midi_path
+    elif isinstance(midi_path, str):
+        midi_str = midi_path
+        midi_path = Path(midi_str)
+    else:
+        print(f'ERR: argument type not supported {type(midi_path)}', file=sys.stderr)
+        sys.exit(1)
 
     if m := re.compile(r'^([^\.]*)\.(midi|mid)$').match(midi_str):
         default_out = Path(m.group(1) + '.flac')
