@@ -7,7 +7,6 @@
     <<
         \new Voice
         {
-            f4
             a4
         }
     >>

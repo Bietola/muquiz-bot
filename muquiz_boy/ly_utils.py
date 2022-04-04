@@ -4,6 +4,7 @@ from pathlib import Path
 import re
 import abjad as abj
 import sys
+from itertools import accumulate
 
 
 MODES = {
@@ -14,13 +15,11 @@ MODES = {
 
 
 def make_scale(tonic, interval_segment, octave=4, degrees=range(1, 8)):
-    pitches = []
     pitch = abj.NamedPitch(tonic)
-    pitches.append(pitch)
-    for i, interval in enumerate(interval_segment):
-        if (i + 1) in degrees:
-            pitch = pitch + interval
-            pitches.append(pitch)
+
+    pitches = list(accumulate((pitch,) + interval_segment.items))
+    pitches = [pitches[i - 1] for i in degrees]
+
     pitch_segment = abj.PitchSegment(pitches)
     return pitch_segment
 
@@ -66,7 +65,10 @@ def midi2flac(midi_path, out=None):
         midi_str = midi_path
         midi_path = Path(midi_str)
     else:
-        print(f'ERR: argument type not supported {type(midi_path)}', file=sys.stderr)
+        print(
+            f'ERR: argument type not supported {type(midi_path)}',
+            file=sys.stderr
+        )
         sys.exit(1)
 
     if m := re.compile(r'^([^\.]*)\.(midi|mid)$').match(midi_str):

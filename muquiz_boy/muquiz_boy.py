@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import os
 import abjad as abj
+from pprint import pformat
 
 import progression as prog
 import bot_paths as paths
@@ -17,7 +18,7 @@ g_options = json.loads(
 
 # Game state
 g_game = {
-    'INIT_PRIZE': 10,
+    'INIT_PRIZE': 0.5,
     'ALL_NOTES': ['c', 'd', 'e', 'f', 'g'],
 
     'players': defaultdict(
@@ -30,7 +31,7 @@ g_game = {
     ),
 
     'round': {
-        'answer': 'c',
+        'answer': prog.gen_round_info(prog.LEVELS[1]),
         'messages_to_del': []
     }
 }
@@ -56,9 +57,9 @@ def reset_attempts():
 def cancel_round(upd, ctx):
     return ConversationHandler.END
 
+
 def start_round(upd, ctx):
     global g_game
-    msg_to_del = g_game['round']['messages_to_del']
 
     user = upd.message.from_user.username
     level = prog.get_lv(g_game, user)
@@ -94,7 +95,7 @@ def start_round(upd, ctx):
             open(audio_path, 'rb')
         )
     )
-    
+
     # Pick and send note(s) to guess
     # TODO: Handle multiple notes
     # TODO: Handle other scales
@@ -104,18 +105,15 @@ def start_round(upd, ctx):
     g_game['round']['answer'] = answer
 
     msg_to_del.append(upd.message.reply_audio(
-        open(
-            ly.midi2flac(
-                abj.persist.as_midi(
-                    ly.lyfile_wrap(
-                        abj.Score([abj.Voice(answer)]),
-                        gen_midi=True
-                    ),
-                    'answer.midi'
-                )[0]
-            ),
-            'rb'
-        ),
+        ly.midi2flac(
+            abj.persist.as_midi(
+                ly.lyfile_wrap(
+                    abj.Score([abj.Voice(answer)]),
+                    gen_midi=True
+                ),
+                'answer.midi'
+            )[0]
+        ).open('rb'),
         caption=f'Guess this tune (prize: {g_game["INIT_PRIZE"]})'
     ))
 
@@ -239,13 +237,37 @@ def mkloop(upd, ctx):
     return MKLOOP
 
 
+def game_query(init_args=None, setter=False, getter=True):
+    def send(upd, ctx):
+        global g_game
+
+        q_result = g_game
+
+        keys = init_args.split('.') if init_args else []
+        keys = keys + (ctx.args[0].split('.') if len(ctx.args) > 0 else [])
+        for key in keys:
+            if key == '%':
+                key = upd.message.from_user.username
+
+            q_result = q_result[key]
+
+        upd.message.reply_text(pformat(q_result))
+
+    return send
+
+
 round_handler = ConversationHandler(
     entry_points=[
         CommandHandler('mk', mk_reply),
         CommandHandler('mklp', lambda _1, _2: MKLOOP),
 
         CommandHandler('qz', start_round),
-        CommandHandler('rank', send_rank)
+        CommandHandler('rank', send_rank),
+
+        CommandHandler('q', game_query()),
+        CommandHandler('qpl', game_query('players')),
+        CommandHandler('qround', game_query('round')),
+        CommandHandler('lv', game_query('players.%.level'))
     ],
     states={
         RECV_ANS: [MessageHandler(Filters.text, receive_ans)],

@@ -16,8 +16,8 @@ LEVELS = {
         'modes': [ly.MODES['major']],
         'tonics': [abj.NamedPitch('c')],
         'octaves': [abj.Octave(4)],
-        'degrees': [1, 2, 3, 4, 5, 6, 7, 8],
-        'notes_n': 2
+        'degrees': [5, 6, 7, 8],
+        'notes_n': 1
     },
 }
 
