@@ -6,6 +6,8 @@ from pathlib import Path
 import os
 import abjad as abj
 from pprint import pformat
+from lenses import bind
+from numbers import Number
 
 import progression as prog
 import bot_paths as paths
@@ -18,14 +20,16 @@ g_options = json.loads(
 
 # Game state
 g_game = {
-    'INIT_PRIZE': 0.5,
+    'INIT_PRIZE': 3,
     'ALL_NOTES': ['c', 'd', 'e', 'f', 'g'],
 
     'players': defaultdict(
         lambda: {
             'points': 0,
             'active': False,
-            'attempts': 0
+            'attempts': 0,
+            'guesses': 0,
+            'accuracy': 0
         },
         json.loads((paths.ASSETS / 'players.json').open(encoding='utf8').read())
     ),
@@ -139,12 +143,37 @@ def receive_ans(upd, ctx):
     # upd.message.reply_text(f'DB: {str_answer}')
 
     if upd.message.text.lower().split() == str_answer:
-        upd.message.reply_text(f'Ye, {user} gets +{prize}')
+        pl = players[user]
+
         players[user]['points'] += prize
 
         for msg in msg_to_del:
             ctx.bot.delete_message(upd.effective_chat.id, msg.message_id)
         g_game['round']['messages_to_del'] = []
+
+        right_first_try = int(prize == g_game['INIT_PRIZE'])
+
+        pl['accuracy'] = ((pl['accuracy'] * pl['guesses']) + right_first_try) / (pl['guesses'] + 1)
+        pl['guesses'] += 1
+
+        upd.message.reply_text(
+            f'Ye, {user} gets +{prize} ({pl["guesses"]}/{round(pl["accuracy"], 2)})'
+        )
+
+        lv = prog.get_lv(g_game, user)
+        if pl['guesses'] >= lv['min_guesses'] and pl['accuracy'] >= lv['min_accuracy']:
+            lv_up_prize = 10 * pl['level']
+
+            pl['level'] += 1
+            pl['accuracy'] = 0
+            pl['guesses'] = 0
+            pl['points'] += lv_up_prize
+
+            upd.message.reply_text(
+                f'{user} reached level {pl["level"]} and gets a +{lv_up_prize}points prize!\n'
+                f'level {pl["level"]}:\n'
+                f'{pformat(prog.get_lv(g_game, user))}'
+            )
 
         save_game()
 
@@ -165,7 +194,7 @@ def send_rank(upd, ctx):
 
     upd.message.reply_text(
         json.dumps(
-            players,
+            bind(players).Recur(Number).modify(lambda x: round(x, 3)),
             indent=4
         )
     )
