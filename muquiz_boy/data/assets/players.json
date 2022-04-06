@@ -1,11 +1,11 @@
 {
     "Dincio": {
-        "points": 248.0,
+        "points": 416.9375,
         "active": false,
-        "attempts": 2,
-        "level": 1,
-        "guesses": 0,
-        "accuracy": 0 
+        "attempts": 0,
+        "level": 4,
+        "guesses": 9,
+        "accuracy": 0.9444444444444444
     },
     "NiggaCrash": {
         "points": 50.0,
@@ -13,15 +13,15 @@
         "attempts": 0,
         "level": 1,
         "guesses": 0,
-        "accuracy": 0 
+        "accuracy": 0
     },
     "Bredo_21": {
-        "points": 187.00000143051147,
+        "points": 333.5000014305115,
         "active": false,
-        "attempts": 21,
-        "level": 1,
+        "attempts": 0,
+        "level": 2,
         "guesses": 0,
-        "accuracy": 0 
+        "accuracy": 0
     },
     "Lanky_Kong": {
         "points": 0,
@@ -29,6 +29,6 @@
         "attempts": 0,
         "level": 1,
         "guesses": 0,
-        "accuracy": 0 
+        "accuracy": 0
     }
 }

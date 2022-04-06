@@ -131,6 +131,9 @@ def receive_ans(upd, ctx):
     players = g_game['players']
     user = upd.message.from_user.username
 
+    if upd.message.text[0] == '/':
+        return RECV_ANS
+
     prize = g_game['INIT_PRIZE'] / (2 ** players[user]['attempts'])
 
     msg_to_del.append(upd.message)
@@ -147,11 +150,10 @@ def receive_ans(upd, ctx):
 
         players[user]['points'] += prize
 
-        for msg in msg_to_del:
-            ctx.bot.delete_message(upd.effective_chat.id, msg.message_id)
-        g_game['round']['messages_to_del'] = []
-
-        right_first_try = int(prize == g_game['INIT_PRIZE'])
+        if (prize == g_game['INIT_PRIZE']):
+            right_first_try = 1.5
+        else:
+            right_first_try = 0
 
         pl['accuracy'] = ((pl['accuracy'] * pl['guesses']) + right_first_try) / (pl['guesses'] + 1)
         pl['guesses'] += 1
@@ -174,6 +176,10 @@ def receive_ans(upd, ctx):
                 f'level {pl["level"]}:\n'
                 f'{pformat(prog.get_lv(g_game, user))}'
             )
+
+        for msg in msg_to_del:
+            ctx.bot.delete_message(upd.effective_chat.id, msg.message_id)
+        g_game['round']['messages_to_del'] = []
 
         save_game()
 

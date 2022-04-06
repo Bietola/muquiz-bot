@@ -1,4 +1,4 @@
-\version "2.22.2"
+\version "2.20.0"
 \language "english"
 \score
 {
@@ -7,7 +7,8 @@
     <<
         \new Voice
         {
-            c4
+            d4
+            a4
         }
     >>
 }
