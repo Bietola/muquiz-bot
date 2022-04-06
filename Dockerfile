@@ -9,7 +9,7 @@ RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:$PATH"
 
 # Packages used by poetry dependencies
-RUN apt-get install -y graphviz
+RUN apt-get install -y lilypond fluidsynth
 # Interactive command line dependencies
 RUN apt-get install -y screen
 
@@ -30,4 +30,4 @@ RUN poetry install --no-interaction --no-ansi
 
 # Should be started in interactive shell using `docker run -it muquiz-boy`
 # CMD poetry run python main.py
-CMD PATH="/code/muquiz-boy/bin/docker:$PATH" bash
+CMD PATH="/code/muquiz_boy/bin/docker:$PATH" bash

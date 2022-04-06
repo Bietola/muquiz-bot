@@ -139,3 +139,12 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# CUSTOM SECTION
+# Don't consider backups
+muquiz_boy/bu/
+
+# Don't consider game data, cache and saves
+muquiz_boy/data/game-data/
+muquiz_boy/data/saves/
+muquiz_boy/data/cache/

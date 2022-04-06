@@ -10,11 +10,6 @@ import random
 import bot_paths as paths
 from ly_utils import *
 
-# Game options
-g_options = json.loads(
-    (paths.ASSETS / 'options.json').open(encoding='utf8').read()
-)
-
 # Game state
 g_game = {
     'INIT_PRIZE': 10,
@@ -26,7 +21,7 @@ g_game = {
             'active': False,
             'attempts': 0
         },
-        json.loads((paths.ASSETS / 'players.json').open(encoding='utf8').read())
+        json.loads((paths.GAME_DATA / 'players.json').open(encoding='utf8').read())
     ),
 
     'round': {
@@ -41,7 +36,7 @@ RECV_ANS, MKLOOP = range(2)
 def save_game(field=None):
     global g_game
 
-    (paths.ASSETS / 'players.json').write_text(
+    (paths.GAME_DATA / 'players.json').write_text(
         json.dumps(g_game['players'], indent=4),
         encoding='utf-8'
     )

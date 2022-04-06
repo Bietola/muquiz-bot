@@ -2,7 +2,7 @@
 
 REP="$(git rev-parse --show-toplevel)"
 
-cd "$REP/nation_game"
+cd "$REP/muquiz_boy"
 # poetry install
 poetry run python main.py
 cd -
