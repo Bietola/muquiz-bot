@@ -3,7 +3,7 @@
 \language "english"
 \score {
     \relative c' {
-        c
+        Mamma first try
     }
     \layout {}
     \midi {}

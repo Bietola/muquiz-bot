@@ -8,6 +8,7 @@ import abjad as abj
 from pprint import pformat
 from lenses import bind
 from numbers import Number
+import shutil
 
 import progression as prog
 import bot_paths as paths
@@ -230,32 +231,29 @@ def mkloop(upd, ctx):
     # TODO: Err not text
     expr = upd.message.text
 
-    upd.message.reply_text('Compiling lilypond...')
-
     if expr == '/stop':
         return ConversationHandler.END
-    # elif m := re.compile(r'^/tr\s+(\w+)\s+(\w+)\s*$').match(expr):
-    #     frm = m.group(1)
-    #     to = m.group(2)
 
-    #     ly.music.document(
-    #         ly.document.Document(current_ly)
-    #     )
+    if expr[0] != ':':
+        return MKLOOP
 
-    #     current_ly = ly.transpose(current_ly, frm, to)
+    expr = expr[1:]
 
-    #     # TODO: upd.message.reply_text(ly_extract_expr(current_ly))
-    #     upd.message.reply_text(current_ly)
-    #     # ly_make_send(current_ly)
+    upd.message.reply_text('Compiling lilypond...')
 
-    #     return MKLOOP
-
-    # TODO: Wrap in ly_make_send
-    pdf_path, midi_path, ly_path = ly.make_lilypond_expr(
-        expr,
-        relative_note='c\''
-        # language=''
+    ly_file = ly.lyfile_wrap(
+        abj.Score([abj.Voice(expr)]),
+        gen_midi=True
     )
+
+    # Create various files
+    old_dir = Path().cwd()
+    os.chdir(paths.CACHE)
+
+    midi_path = abj.persist.as_midi(ly_file, 'current.midi')[0]
+    pdf_path = abj.persist.as_pdf(ly_file, 'current.pdf')[0]
+    ly_path = abj.persist.as_ly(ly_file, 'current.ly')[0]
+    shutil.copy(ly_path, paths.CURRENT_LY)
 
     upd.message.reply_audio(
         open(ly.midi2flac(midi_path), 'rb')
@@ -263,6 +261,8 @@ def mkloop(upd, ctx):
     upd.message.reply_document(
         open(pdf_path, 'rb')
     )
+
+    os.chdir(old_dir)
 
     return MKLOOP
 

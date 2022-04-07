@@ -28,9 +28,14 @@ def lyfile_wrap(score, gen_midi=False):
     return abj.LilyPondFile([abj.Block(
         'score',
         [
+            abj.Block('layout'),
             abj.Block('midi'),
             score
-        ] if gen_midi else [score]
+        ] if gen_midi else [
+            abj.Block('layout'),
+            abj.Block('midi'),
+            score
+        ]
     )])
 
 
@@ -84,31 +89,6 @@ def midi2flac(midi_path, out=None):
     FluidSynth().midi_to_audio(midi_path, out)
 
     return out
-
-
-def make_lilypond_expr(expr, language='english', relative_note='c'):
-    old_path = Path.cwd()
-    os.chdir(paths.CACHE)
-
-    ly_path = Path('out.ly').resolve()
-
-    with open(ly_path, 'w') as f:
-        print(
-            (paths.TEMPLATES / 'single_piano.ly').open(encoding='utf8').read().format(
-                language=language,
-                relative_note=relative_note,
-                notes_to_play=expr
-            ),
-            file=f
-        )
-
-    os.system(f'lilypond {ly_path}')
-
-    pdf_path = Path('out.pdf').resolve()
-    midi_path = Path('out.midi').resolve()
-
-    os.chdir(old_path)
-    return pdf_path, midi_path, ly_path
 
 
 def add_midi_to_abjad_output(raw):
