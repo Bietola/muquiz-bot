@@ -10,5 +10,7 @@ GAME_DATA = DATA / 'game-data'
 CACHE = DATA / 'cache'
 
 SAVES = DATA / 'saves'
-# TODO: Make this player-specific
-CURRENT_LY = SAVES / 'current.ly'
+
+
+def user_current_ly(user):
+    return SAVES / user / 'current.ly'

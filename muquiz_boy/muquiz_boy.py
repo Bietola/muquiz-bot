@@ -253,7 +253,6 @@ def mkloop(upd, ctx):
     midi_path = abj.persist.as_midi(ly_file, 'current.midi')[0]
     pdf_path = abj.persist.as_pdf(ly_file, 'current.pdf')[0]
     ly_path = abj.persist.as_ly(ly_file, 'current.ly')[0]
-    shutil.copy(ly_path, paths.CURRENT_LY)
 
     upd.message.reply_audio(
         open(ly.midi2flac(midi_path), 'rb')
