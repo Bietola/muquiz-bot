@@ -225,6 +225,8 @@ def mk_reply(upd, ctx):
 
 
 def mkloop(upd, ctx):
+    global g_game
+
     user = upd.message.from_user.username
     # current_ly = g_game['players'][user]['saves']['current']
 
@@ -241,8 +243,13 @@ def mkloop(upd, ctx):
 
     upd.message.reply_text('Compiling lilypond...')
 
+    # ly_file = ly.lyfile_wrap(
+    #     abj.Score([abj.Voice(expr)]),
+    #     gen_midi=True
+    # )
+    session = g_game[user]['abjad_session']
     ly_file = ly.lyfile_wrap(
-        abj.Score([abj.Voice(expr)]),
+        session.score,
         gen_midi=True
     )
 
