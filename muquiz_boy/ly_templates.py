@@ -2,12 +2,13 @@ import abjad as abj
 
 
 # TODO: Add other templates
-START_TEMPLATES = {
-    'piano': piano_template()
-}
+# START_TEMPLATES = {
+#     'piano': piano_template()
+# }
 
 
-def piano_template(right='', left=''):
+# TODO: Find way to generate with no notes
+def piano_template(right='c', left='c'):
     piano = abj.StaffGroup(
         [
             abj.Staff(

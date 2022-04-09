@@ -13,6 +13,7 @@ import progression as prog
 import bot_paths as paths
 import ly_utils as ly
 import ly_templates as lytemp
+import editor as ed
 
 # Game state
 g_game = {
@@ -246,9 +247,9 @@ def mkloop(upd, ctx):
     upd.message.reply_text('Compiling lilypond...')
 
     # TODO: Load using pickle
-    session = g_game[user].get(
+    session = g_game['players'][user].get(
         'composing_session',
-        lytemp.piano_template()
+        ed.LySessionSave(lytemp.piano_template('c','c'))
     )
 
     ly_file = ly.lyfile_wrap(
