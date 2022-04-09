@@ -34,13 +34,19 @@ def apply_edit(cur_session, edit):
             substitute_voice(sess.score, sess.cur_edit, contents)
 
         # Add instrument
-        # TODO: Consider shorter version?
+        # TODO: Consider shorter version of `add` string?
         elif command == 'add':
             name = args[0]
 
             voice = abj.Voice('c', name='voice1')
             abj.attach(abj.Trumpet(), voice[0])
+
             staff = abj.Staff([voice], name=name)
+            abj.attach(
+                abj.LilyPondLiteral(r'\set Staff.midiInstrument = "trumpet"'),
+                staff[0]
+            )
+
             sess.score.append(staff)
 
 
