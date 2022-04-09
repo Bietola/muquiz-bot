@@ -7,16 +7,20 @@ import abjad as abj
 # }
 
 
+def opt_voice(notes=None, name='voice1'):
+    return abj.Voice(notes, name=name) if notes else abj.Voice(name=name)
+
+
 # TODO: Find way to generate with no notes
-def piano_template(right='c', left='c'):
+def piano_template(right=None, left=None):
     piano = abj.StaffGroup(
         [
             abj.Staff(
-                [abj.Voice(right, name='voice1')],
+                [opt_voice(right, name='voice1')],
                 name='right'
             ),
             abj.Staff(
-                [abj.Voice(left, name='voice1')],
+                [opt_voice(left, name='voice1')],
                 name='left'
             )
         ],

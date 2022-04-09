@@ -33,6 +33,16 @@ def apply_edit(cur_session, edit):
         elif command == 's':
             substitute_voice(sess.score, sess.cur_edit, contents)
 
+        # Add instrument
+        # TODO: Consider shorter version?
+        elif command == 'add':
+            name = args[0]
+
+            voice = abj.Voice('c', name='voice1')
+            abj.attach(abj.Trumpet(), voice[0])
+            staff = abj.Staff([voice], name=name)
+            sess.score.append(staff)
+
 
 def substitute_voice(score, voice_path, contents):
     to_edit = score
@@ -40,6 +50,11 @@ def substitute_voice(score, voice_path, contents):
         key = key.strip('\n')
 
         to_edit = to_edit[key]
+
+    # TODO: DB
+    # from pprint import pprint
+    # print('printing contents')
+    # pprint(contents)
 
     # TODO: Make specifying different voices possible
     abj.mutate.replace(

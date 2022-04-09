@@ -234,23 +234,26 @@ def mkloop(upd, ctx):
     user = upd.message.from_user.username
 
     # TODO: Handle err not text
-    expr = upd.message.text
+    edit = upd.message.text
 
-    if expr == '/stop':
+    if edit == '/stop':
         return ConversationHandler.END
 
-    if expr[0] != ':':
+    if edit[0] != ':':
         return MKLOOP
-
-    expr = expr[1:]
 
     upd.message.reply_text('Compiling lilypond...')
 
     # TODO: Load using pickle
-    session = g_game['players'][user].get(
-        'composing_session',
-        ed.LySessionSave(lytemp.piano_template('c','c'))
+    # TODO: Don't save to players.json
+    session = g_game['players'][user].setdefault(
+        '_composing_session',
+        ed.LySessionSave(
+            lytemp.piano_template()
+        )
     )
+
+    ed.apply_edit(session, edit)
 
     ly_file = ly.lyfile_wrap(
         session.score,
