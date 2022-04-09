@@ -8,11 +8,11 @@ import abjad as abj
 from pprint import pformat
 from lenses import bind
 from numbers import Number
-import shutil
 
 import progression as prog
 import bot_paths as paths
 import ly_utils as ly
+import ly_templates as lytemp
 
 # Game state
 g_game = {
@@ -39,6 +39,7 @@ g_game = {
 # ConversationHandler states
 RECV_ANS, MKLOOP = range(2)
 
+
 def save_game(field=None):
     global g_game
 
@@ -47,11 +48,13 @@ def save_game(field=None):
         encoding='utf-8'
     )
 
+
 def reset_attempts():
     global g_game
 
     for pl in g_game['players'].values():
         pl['attempts'] = 0
+
 
 # Handler functions
 def cancel_round(upd, ctx):
@@ -228,9 +231,8 @@ def mkloop(upd, ctx):
     global g_game
 
     user = upd.message.from_user.username
-    # current_ly = g_game['players'][user]['saves']['current']
 
-    # TODO: Err not text
+    # TODO: Handle err not text
     expr = upd.message.text
 
     if expr == '/stop':
@@ -243,7 +245,12 @@ def mkloop(upd, ctx):
 
     upd.message.reply_text('Compiling lilypond...')
 
-    session = g_game[user]['abjad_session']
+    # TODO: Load using pickle
+    session = g_game[user].get(
+        'composing_session',
+        lytemp.piano_template()
+    )
+
     ly_file = ly.lyfile_wrap(
         session.score,
         gen_midi=True
