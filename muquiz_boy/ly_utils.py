@@ -24,16 +24,18 @@ def make_scale(tonic, interval_segment, octave=4, degrees=range(1, 8)):
     return pitch_segment
 
 
-def lyfile_wrap(score, gen_midi=False):
+def lyfile_wrap(score, gen_midi=False, midi_tempo=128):
+    midi_block = abj.Block('midi', items=[rf'\tempo 4 = {midi_tempo}'])
+
     return abj.LilyPondFile([abj.Block(
         'score',
         [
             abj.Block('layout'),
-            abj.Block('midi'),
+            midi_block,
             score
         ] if gen_midi else [
             abj.Block('layout'),
-            abj.Block('midi'),
+            midi_block,
             score
         ]
     )])

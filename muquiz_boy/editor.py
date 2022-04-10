@@ -8,6 +8,7 @@ class LySessionSave:
         self.score = score
         self.edit_list = []
         self.cur_edit = []
+        self.tempo = 128
 
 
 def apply_edit(cur_session, edit):
@@ -59,6 +60,11 @@ def apply_edit(cur_session, edit):
                 also_get_parent=True
             )
             parent.remove(to_rem)
+
+        elif command == 'tempo':
+            tempo = args[0]
+
+            sess.tempo = tempo
 
 
 def substitute_voice(score, voice_path, contents):

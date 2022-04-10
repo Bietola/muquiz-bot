@@ -286,7 +286,8 @@ def mkloop(upd, ctx):
 
     ly_file = ly.lyfile_wrap(
         session.score,
-        gen_midi=True
+        gen_midi=True,
+        midi_tempo=session.tempo
     )
 
     # Create various files
