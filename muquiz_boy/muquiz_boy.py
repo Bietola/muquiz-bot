@@ -26,7 +26,8 @@ g_game = {
             'active': False,
             'attempts': 0,
             'guesses': 0,
-            'accuracy': 0
+            'accuracy': 0,
+            'level': 1
         },
         json.loads((paths.GAME_DATA / 'players.json').open(encoding='utf8').read())
     ),
@@ -45,7 +46,10 @@ def save_game(field=None):
     global g_game
 
     (paths.GAME_DATA / 'players.json').write_text(
-        json.dumps(g_game['players'], indent=4),
+        json.dumps(
+            bind(g_game['players']).Keys().Filter(lambda k: k[0] == '_').set(None),
+            indent=4
+        ),
         encoding='utf-8'
     )
 

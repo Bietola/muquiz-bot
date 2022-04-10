@@ -1,7 +1,8 @@
-\version "2.20.0"
+\version "2.22.2"
 \language "english"
 \score
 {
+    \layout {}
     \midi {}
     \new Score
     <<
