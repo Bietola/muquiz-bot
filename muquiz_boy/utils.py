@@ -30,3 +30,28 @@ def wait_until_connected(delay, trace=False):
         else:
             print(f'Connection failed... checking again in {delay}s')
             time.sleep(delay)
+
+
+def dotted_access(
+        dict_thing,
+        path,
+        separator='.',
+        access=lambda d, k: d[k],
+        process_k=lambda v: v,
+        skip_first=False,
+        also_get_parent=False
+):
+    res = dict_thing
+    path_segs = path.split(separator)
+
+    if skip_first:
+        path_segs = path_segs[1:]
+
+    parent = None
+    for key in path_segs:
+        key = process_k(key)
+
+        parent = res
+        res = access(res, key)
+
+    return (res, parent) if also_get_parent else res

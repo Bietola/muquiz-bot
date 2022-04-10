@@ -1,5 +1,6 @@
 from dotty_dict import dotty
 import abjad as abj
+import utils as utl
 
 
 class LySessionSave:
@@ -39,23 +40,34 @@ def apply_edit(cur_session, edit):
             name = args[0]
 
             voice = abj.Voice('c', name='voice1')
-            abj.attach(abj.Trumpet(), voice[0])
+            # TODO: Find out if attaching instrument is actually necessary
+            # abj.attach(abj.Trumpet(), voice[0])
 
             staff = abj.Staff([voice], name=name)
-            abj.attach(
-                abj.LilyPondLiteral(r'\set Staff.midiInstrument = "trumpet"'),
-                staff[0]
-            )
+            abj.setting(staff).midiInstrument = '"trumpet"'
 
             sess.score.append(staff)
 
+        elif command == 'rem':
+            voice_path = args[0]
+
+            to_rem, parent = utl.dotted_access(
+                sess.score,
+                voice_path,
+                separator='/',
+                skip_first=True,
+                also_get_parent=True
+            )
+            parent.remove(to_rem)
+
 
 def substitute_voice(score, voice_path, contents):
-    to_edit = score
-    for key in voice_path.split('/')[1:]:
-        key = key.strip('\n')
-
-        to_edit = to_edit[key]
+    to_edit = utl.dotted_access(
+        score,
+        voice_path.strip('\n'),
+        separator='/',
+        skip_first=True
+    )
 
     # TODO: DB
     # from pprint import pprint
@@ -63,6 +75,7 @@ def substitute_voice(score, voice_path, contents):
     # pprint(contents)
 
     # TODO: Make specifying different voices possible
+    new_voice = abj.Voice(str(contents), name='voice1'),
     abj.mutate.replace(
         to_edit['voice1'],
         # TODO: Find out why `str` is needed
