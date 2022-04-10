@@ -8,7 +8,9 @@ import abjad as abj
 from pprint import pformat
 from lenses import bind
 from numbers import Number
+import pickle
 
+import path_utils as putl
 import progression as prog
 import bot_paths as paths
 import ly_utils as ly
@@ -212,6 +214,20 @@ def send_rank(upd, ctx):
     return ConversationHandler.END
 
 
+def save_ly_session(upd, ctx):
+    user = upd.message.from_user.username
+
+    global g_game
+
+    upd.message.reply_text('Saving current session...')
+
+    putl.create(paths.user_session_savefile(user)).write_bytes(
+        pickle.dumps(g_game['players'][user]['_composing_session'])
+    )
+
+    upd.message.reply_text('Session saved!')
+
+
 def mk_reply(upd, ctx):
     # TODO: Put errors here
     if not (reply := upd.message.reply_to_message):
@@ -235,13 +251,17 @@ def mk_reply(upd, ctx):
 def mkloop(upd, ctx):
     global g_game
 
-    user = upd.message.from_user.username
+    userid = upd.message.from_user.username
+    user = g_game['players'][userid]
 
     # TODO: Handle err not text
     edit = upd.message.text
 
     if edit == '/stop':
         return ConversationHandler.END
+
+    if edit == '/save':
+        save_ly_session(upd, ctx)
 
     if edit[0] != ':':
         return MKLOOP
@@ -250,12 +270,17 @@ def mkloop(upd, ctx):
 
     # TODO: Load using pickle
     # TODO: Don't save to players.json
-    session = g_game['players'][user].setdefault(
-        '_composing_session',
-        ed.LySessionSave(
-            lytemp.piano_template()
-        )
-    )
+    if not (session := user.get('_composing_session')):
+        savefile = paths.user_session_savefile(userid)
+        if savefile.exists():
+            with open(savefile, 'rb') as savefile:
+                session = pickle.load(savefile)
+        else:
+            session = ed.LySessionSave(
+                # TODO: Let user pick starting template
+                lytemp.piano_template()
+            )
+        user['_composing_session'] = session
 
     ed.apply_edit(session, edit)
 

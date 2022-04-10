@@ -12,5 +12,5 @@ CACHE = DATA / 'cache'
 SAVES = DATA / 'saves'
 
 
-def user_current_ly(user):
-    return SAVES / user / 'current.ly'
+def user_session_savefile(user):
+    return SAVES / user / 'current.pickle'
