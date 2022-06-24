@@ -39,13 +39,15 @@ def apply_edit(cur_session, edit):
         # TODO: Consider shorter version of `add` string?
         elif command == 'add':
             name = args[0]
+            instrument = args[1].replace('_', ' ')
 
             voice = abj.Voice('c', name='voice1')
             # TODO: Find out if attaching instrument is actually necessary
             # abj.attach(abj.Trumpet(), voice[0])
 
             staff = abj.Staff([voice], name=name)
-            abj.setting(staff).midiInstrument = '"trumpet"'
+            abj.setting(staff).midiInstrument = f'"{instrument}"'
+            abj.setting(staff).instrumentName = f'"{instrument.title()}"'
 
             sess.score.append(staff)
 
@@ -85,7 +87,7 @@ def substitute_voice(score, voice_path, contents):
     abj.mutate.replace(
         to_edit['voice1'],
         # TODO: Find out why `str` is needed
-        abj.Voice(str(contents), name='voice1'),
+        abj.Voice(contents, name='voice1'),
         # TODO: Find out why can't do this
         # wrappers=True
     )

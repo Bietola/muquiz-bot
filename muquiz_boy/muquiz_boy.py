@@ -71,6 +71,8 @@ def cancel_round(upd, ctx):
 def start_round(upd, ctx):
     global g_game
 
+    print(f'id: {upd.effective_chat.id}')
+
     user = upd.message.from_user.username
     level = prog.get_lv(g_game, user)
     msg_to_del = g_game['round']['messages_to_del']
@@ -268,8 +270,8 @@ def mkloop(upd, ctx):
 
     upd.message.reply_text('Compiling lilypond...')
 
-    # TODO: Load using pickle
-    # TODO: Don't save to players.json
+    # Try session load. First from memory, then from pickle,
+    # then from default template.
     if not (session := user.get('_composing_session')):
         savefile = paths.user_session_savefile(userid)
         if savefile.exists():

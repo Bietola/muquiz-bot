@@ -3,7 +3,10 @@
 \score
 {
     \layout {}
-    \midi {}
+    \midi
+    {
+        \tempo 4 = 128
+    }
     \new Score
     <<
         \new PianoStaff

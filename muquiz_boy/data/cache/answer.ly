@@ -3,12 +3,15 @@
 \score
 {
     \layout {}
-    \midi {}
+    \midi
+    {
+        \tempo 4 = 128
+    }
     \new Score
     <<
         \new Voice
         {
-            e4
+            f4
         }
     >>
 }

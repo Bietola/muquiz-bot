@@ -88,7 +88,7 @@ def midi2flac(midi_path, out=None):
         out = default_out
 
     from midi2audio import FluidSynth
-    FluidSynth().midi_to_audio(midi_path, out)
+    FluidSynth(paths.DEFAULT_SOUNDFONT).midi_to_audio(midi_path, out)
 
     return out
 
