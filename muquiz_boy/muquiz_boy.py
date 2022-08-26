@@ -223,8 +223,9 @@ def save_ly_session(upd, ctx):
 
     upd.message.reply_text('Saving current session...')
 
-    putl.create(paths.user_session_savefile(user)).write_bytes(
-        pickle.dumps(g_game['players'][user]['_composing_session'])
+    session = g_game['players'][user]['_composing_session']
+    putl.create(paths.user_session_savefile(user, session.name)).write_bytes(
+        pickle.dumps(session)
     )
 
     upd.message.reply_text('Session saved!')
@@ -270,21 +271,16 @@ def mkloop(upd, ctx):
 
     upd.message.reply_text('Compiling lilypond...')
 
-    # Try session load. First from memory, then from pickle,
-    # then from default template.
-    if not (session := user.get('_composing_session')):
-        savefile = paths.user_session_savefile(userid)
-        if savefile.exists():
-            with open(savefile, 'rb') as savefile:
-                session = pickle.load(savefile)
-        else:
-            session = ed.LySessionSave(
-                # TODO: Let user pick starting template
-                lytemp.piano_template()
-            )
+    # Session load. First try fetching session with requested name from memory,
+    # then from pickle, finally create one with given name from default
+    # template.
+    session = user.get('_composing_session')
+    if not session:
+        session = paths.user_load_session(userid, 'default')
         user['_composing_session'] = session
 
-    ed.apply_edit(session, edit)
+    ed.apply_edit(userid, user, edit)
+    session = user.get('_composing_session')
 
     ly_file = ly.lyfile_wrap(
         session.score,

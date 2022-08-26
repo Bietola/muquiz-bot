@@ -2,17 +2,23 @@ from dotty_dict import dotty
 import abjad as abj
 import utils as utl
 
+import bot_paths as paths
+
 
 class LySessionSave:
-    def __init__(self, score):
+    def __init__(self, name, score):
+        self.name = name
+        self.load_next = None
         self.score = score
         self.edit_list = []
         self.cur_edit = []
         self.tempo = 128
 
 
-def apply_edit(cur_session, edit):
-    sess = cur_session
+# Applied to user as multiple scores could be edited at the same time
+# TODO: Incorporate userid into user and pass only user
+def apply_edit(userid, user, edit):
+    sess = user['_composing_session']
 
     # NB. ignore all before mention of first command
     #     (can be used as kind of comment)
@@ -24,8 +30,15 @@ def apply_edit(cur_session, edit):
         # DB
         # print(command, args, contents)
 
+        # Open score
+        if command == 'o':
+            session_name = args[0]
+
+            sess = paths.user_load_session(userid, session_name)
+            user['_composing_session'] = sess
+
         # Edit
-        if command == 'e':
+        elif command == 'e':
             voice_path = args[0]
 
             sess.cur_edit = voice_path
@@ -112,7 +125,7 @@ def test_sub_1_line_piano_left_hand():
     next(sys.stdin)
 
     apply_edit(
-        LySessionSave(score),
+        LySessionSave('test', score),
         ":e /piano/right\n"
         ":s\n"
         "\\relative c' { d4 g c }"
