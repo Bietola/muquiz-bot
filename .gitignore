@@ -145,6 +145,6 @@ cython_debug/
 muquiz_boy/bu/
 
 # Don't consider game data, cache and saves
-muquiz_boy/data/game-data/**
-muquiz_boy/data/saves/**
+# muquiz_boy/data/game-data/**
+# muquiz_boy/data/saves/**
 muquiz_boy/data/cache/**
